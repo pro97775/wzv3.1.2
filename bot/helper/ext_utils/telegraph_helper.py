@@ -3,7 +3,7 @@ from secrets import token_hex
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
 
-from ... import LOGGER
+from bot import LOGGER
 from ...core.config_manager import Config
 
 
@@ -81,5 +81,3 @@ class TelegraphHelper:
 
 
 telegraph = TelegraphHelper(Config.AUTHOR_NAME, Config.AUTHOR_URL)
-
-print(__name__)

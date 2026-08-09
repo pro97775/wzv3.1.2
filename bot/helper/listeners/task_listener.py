@@ -45,6 +45,7 @@ from ..ext_utils.task_manager import check_running_tasks, start_from_queued
 from ..mirror_leech_utils.uphoster_utils.multi_upload import MultiUphosterUpload
 from ..mirror_leech_utils.gdrive_utils.upload import GoogleDriveUpload
 from ..mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
+from ..mirror_leech_utils.upload_utils.mega_upload import add_mega_upload
 from ..mirror_leech_utils.status_utils.uphoster_status import UphosterStatus
 from ..mirror_leech_utils.status_utils.gdrive_status import (
     GoogleDriveStatus,
@@ -115,11 +116,13 @@ class TaskListener(TaskConfig):
             )
         if (
             self.is_super_chat
-            and Config.INCOMPLETE_TASK_NOTIFIER
+            and (Config.INC_TASK_NOTIFY or Config.INC_TASK_RESUME)
             and Config.DATABASE_URL
         ):
             await database.add_incomplete_task(
-                self.message.chat.id, self.message.link, self.tag
+                self.message.chat.id, self.message.link, self.tag,
+                self.message.text or "", self.user_id,
+                self.message.reply_to_message.id if self.message.reply_to_message else 0,
             )
 
     async def on_download_complete(self):
@@ -376,6 +379,11 @@ class TaskListener(TaskConfig):
                 sync_to_async(drive.upload),
             )
             del drive
+        elif self.up_dest == "mega:":
+            LOGGER.info(f"Mega Upload Name: {self.name}")
+            mega_email = self.user_dict.get("MEGA_EMAIL") or ""
+            mega_password = self.user_dict.get("MEGA_PASSWORD") or ""
+            await add_mega_upload(self, up_path, mega_email, mega_password, gid)
         else:
             LOGGER.info(f"Rclone Upload Name: {self.name}")
             RCTransfer = RcloneTransferHelper(self)
@@ -393,7 +401,7 @@ class TaskListener(TaskConfig):
     ):
         if (
             self.is_super_chat
-            and Config.INCOMPLETE_TASK_NOTIFIER
+            and (Config.INC_TASK_NOTIFY or Config.INC_TASK_RESUME)
             and Config.DATABASE_URL
         ):
             await database.rm_complete_task(self.message.link)
@@ -429,11 +437,11 @@ class TaskListener(TaskConfig):
 
             await send_message(self.user_id, msg, button)
             if Config.LEECH_DUMP_CHAT:
-                await send_message(int(Config.LEECH_DUMP_CHAT), msg, button)
+                await send_message(Config.LEECH_DUMP_CHAT, msg, button)
             await send_message(self.message, user_message, button)
 
         elif self.is_leech:
-            msg += f"\n<b>Total Files: </b>{folders}"
+            msg += f"\n┠ <b>Total Files: </b>{folders}"
             if mime_type != 0:
                 msg += f"\n┠ <b>Corrupted Files</b> → {mime_type}"
             msg += f"\n┖ <b>Task By</b> → {self.tag}\n\n"
@@ -499,7 +507,11 @@ class TaskListener(TaskConfig):
             ):
                 buttons = ButtonMaker()
                 if link and Config.SHOW_CLOUD_LINK:
-                    buttons.url_button("☁️ Cloud Link", link, style=ButtonStyle.PRIMARY)
+                    if "mega.nz" in link:
+                        btn_label = "🔗 Mega Link"
+                    else:
+                        btn_label = "☁️ Cloud Link"
+                    buttons.url_button(btn_label, link, style=ButtonStyle.PRIMARY)
                 elif multi_links:
                     for name, url in multi_links:
                         buttons.url_button(name, url)
@@ -535,7 +547,7 @@ class TaskListener(TaskConfig):
                             )
                 button = buttons.build_menu(2)
             else:
-                if not multi_link_msg:
+                if not multi_link_msg and rclone_path:
                     msg += f"\n┃\n┠ Path: <code>{rclone_path}</code>"
                 button = None
             msg += f"\n┃\n┖ <b>Task By</b> → {self.tag}\n\n"
@@ -614,7 +626,7 @@ class TaskListener(TaskConfig):
 
         if (
             self.is_super_chat
-            and Config.INCOMPLETE_TASK_NOTIFIER
+            and (Config.INC_TASK_NOTIFY or Config.INC_TASK_RESUME)
             and Config.DATABASE_URL
         ):
             await database.rm_complete_task(self.message.link)
@@ -652,7 +664,7 @@ class TaskListener(TaskConfig):
 
         if (
             self.is_super_chat
-            and Config.INCOMPLETE_TASK_NOTIFIER
+            and (Config.INC_TASK_NOTIFY or Config.INC_TASK_RESUME)
             and Config.DATABASE_URL
         ):
             await database.rm_complete_task(self.message.link)

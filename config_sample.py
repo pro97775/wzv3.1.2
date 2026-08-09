@@ -20,12 +20,13 @@ STATUS_UPDATE_INTERVAL = 15
 FILELION_API = ""
 STREAMWISH_API = ""
 EXCLUDED_EXTENSIONS = ""
-INCOMPLETE_TASK_NOTIFIER = False
+INC_TASK_NOTIFY = False
 YT_DLP_OPTIONS = ""
 USE_SERVICE_ACCOUNTS = False
 NAME_SWAP = ""
 FFMPEG_CMDS = {}
 UPLOAD_PATHS = {}
+WEB_ACCESS_PASSWORD=""  # Secret for deriving proxy passwords. Logs derived passwords at startup.
 
 # Hyper Tg Downloader
 HELPER_TOKENS = ""
@@ -33,6 +34,7 @@ HELPER_TOKENS = ""
 # MegaAPI v4.30
 MEGA_EMAIL = ""
 MEGA_PASSWORD = ""
+DISABLE_MEGA = False
 
 # Disable Options
 DISABLE_TORRENTS = False
@@ -61,6 +63,12 @@ LEECH_LIMIT = 0
 EXTRACT_LIMIT = 0
 ARCHIVE_LIMIT = 0
 STORAGE_LIMIT = 0
+
+# Image Search
+USE_IMAGES = False
+IMG_SEARCH = ""
+IMG_PAGE = 1
+IMG_SOURCES = ["wallpaperflare"]
 
 # Insta video downloader api
 INSTADL_API = ""
@@ -175,7 +183,6 @@ MIRROR_LOG_ID = ""
 # qBittorrent/Aria2c
 TORRENT_TIMEOUT = 0
 BASE_URL = ""
-BASE_URL_PORT = 0
 WEB_PINCODE = True
 
 # Queueing system

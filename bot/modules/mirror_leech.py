@@ -1,3 +1,4 @@
+from ast import literal_eval
 from base64 import b64encode
 from re import match as re_match
 
@@ -121,6 +122,7 @@ class Mirror(TaskListener):
             "-m": "",
             "-meta": "",
             "-up": "",
+            "-gc": "",
             "-rcf": "",
             "-au": "",
             "-ap": "",
@@ -161,6 +163,7 @@ class Mirror(TaskListener):
         self.seed = args["-d"]
         self.name = args["-n"]
         self.up_dest = args["-up"]
+        self.category = args["-gc"]
         self.rc_flags = args["-rcf"]
         self.link = args["link"]
         self.compress = args["-z"]
@@ -215,7 +218,10 @@ class Mirror(TaskListener):
                 if isinstance(args["-ff"], set):
                     self.ffmpeg_cmds = args["-ff"]
                 else:
-                    self.ffmpeg_cmds = eval(args["-ff"])
+                    value = literal_eval(args["-ff"])
+                    if not isinstance(value, (dict, set, list, tuple)):
+                        raise ValueError("ffmpeg_cmds must be a dict/set/list/tuple")
+                    self.ffmpeg_cmds = value
         except Exception as e:
             self.ffmpeg_cmds = None
             LOGGER.error(e)

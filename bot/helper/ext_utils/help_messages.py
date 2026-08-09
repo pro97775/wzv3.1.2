@@ -410,6 +410,7 @@ def get_bot_commands():
         "Log": "[SUDO] Get Bot Logs for Internal Working",
         "Restart": "[SUDO] Reboot bot",
         "RestartSessions": "[SUDO] Reboot User Sessions",
+        "GenPyroSess": "[SUDO] Generate Pyrogram String Session",
     }
 
     commands = static_commands.copy()
@@ -525,6 +526,14 @@ def get_help_string():
             help_lines.append(f"{cmd_str}: Add sudo user (Only Owner).")
         elif key == "RmSudo":
             help_lines.append(f"{cmd_str}: Remove sudo users (Only Owner).")
+        elif key == "BlackList":
+            help_lines.append(f"{cmd_str}: Blacklist a user from using the bot (Only Owner & Sudo).")
+        elif key == "RmBlackList":
+            help_lines.append(f"{cmd_str}: Remove a user from blacklist (Only Owner & Sudo).")
+        elif key == "AddImage":
+            help_lines.append(f"{cmd_str}: Add an image to the gallery by reply to photo or link.")
+        elif key == "Images":
+            help_lines.append(f"{cmd_str}: View and manage the image gallery.")
         elif key == "Restart":
             help_lines.append(
                 f"{cmd_str}: Restart and update the bot (Only Owner & Sudo)."
@@ -545,6 +554,10 @@ def get_help_string():
             )
         elif key == "Rss":
             help_lines.append(f"/{BotCommands.RssCommand}: RSS Menu.")
+        elif key == "GenPyroSess":
+            help_lines.append(
+                f"/{BotCommands.GenPyroSessCommand}: Generate Pyrogram String Session (Only Owner & Sudo)."
+            )
 
     return "\n".join(help_lines)
 
